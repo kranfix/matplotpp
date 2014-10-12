@@ -5,42 +5,42 @@ Author: Yuichi Katori (yuichi.katori@gmail.com)
 Project:MATPLOT++ (MATLAB-like plotting tool in C++).
 Version:0.3.13
 ****************************************************************************/
-using namespace std;
+
 #include "matplotpp.h"
 
 /// Figure
 void Figure::add_child(int i){Children.push_back(i);}
 /// Axes
 void Axes::reset(){
-    num_child=0;
-    xmin=1e99; xmax=-1e99;
-    ymin=1e99; ymax=-1e99;
-    zmin=1e99; zmax=-1e99;	
+  num_child=0;
+  xmin=1e99; xmax=-1e99;
+  ymin=1e99; ymax=-1e99;
+  zmin=1e99; zmax=-1e99;	
 }
 void Axes::config(){
-    float extent=0,extent_linear=0.03;
-    if((XLimMode==0)&&(xmax>xmin)){
-	if(XScale==0){extent=extent_linear;}
-	if(XScale==1){extent=0;}
-	XLim[0]=xmin-extent*(xmax-xmin); 
-	XLim[1]=xmax+extent*(xmax-xmin);
-    }
-    if((YLimMode==0)&&(ymax>ymin)){
-	if(YScale==0){extent=extent_linear;}
-	if(YScale==1){extent=0;}
-	YLim[0]=ymin-extent*(ymax-ymin); 
-	YLim[1]=ymax+extent*(ymax-ymin);
-    }
-    if((ZLimMode==0)&&(zmax>zmin)){
-	ZLim[0]=zmin-extent*(zmax-zmin); 
-	ZLim[1]=zmax+extent*(zmax-zmin);
-    }	
-    //printf("Z: %d,%f,%f\n",ZLimMode,ZLim[0],ZLim[1]);
-    //if(num_child){Visible=1;}else{Visible=0;}
+  float extent=0,extent_linear=0.03;
+  if((XLimMode==0)&&(xmax>xmin)){
+    if(XScale==0){extent=extent_linear;}
+    if(XScale==1){extent=0;}
+    XLim[0]=xmin-extent*(xmax-xmin); 
+    XLim[1]=xmax+extent*(xmax-xmin);
+  }
+  if((YLimMode==0)&&(ymax>ymin)){
+    if(YScale==0){extent=extent_linear;}
+    if(YScale==1){extent=0;}
+    YLim[0]=ymin-extent*(ymax-ymin); 
+    YLim[1]=ymax+extent*(ymax-ymin);
+  }
+  if((ZLimMode==0)&&(zmax>zmin)){
+    ZLim[0]=zmin-extent*(zmax-zmin);
+    ZLim[1]=zmax+extent*(zmax-zmin);
+  }	
+  //printf("Z: %d,%f,%f\n",ZLimMode,ZLim[0],ZLim[1]);
+  //if(num_child){Visible=1;}else{Visible=0;}
     
-    XTick=make_tick(XLim[0],XLim[1]);
-    YTick=make_tick(YLim[0],YLim[1]);
-    ZTick=make_tick(ZLim[0],ZLim[1]);
+  XTick=make_tick(XLim[0],XLim[1]);
+  YTick=make_tick(YLim[0],YLim[1]);
+  ZTick=make_tick(ZLim[0],ZLim[1]);
 }
     
 int Axes::ID(){return id;}
@@ -49,25 +49,31 @@ void Axes::selected(int i){Selected=i;}
 void Axes::add_child(int i){Children.push_back(i);}
     
 dvec Axes::make_tick(double min,double max){
-	int i,j;
-	double dg;
-	double x,y;
-	int z;
-	x=fabs(max-min);
-	z=(int)log10(x);
-	y=x/pow((double)10,(double)z);
-	dg=1*pow((double)10,(double)z);
-	if(y<5){dg=0.5*pow((double)10,(double)z);}
-	if(y<2){dg=0.2*pow((double)10,(double)z);}
+  int i,j;
+  double dg;
+  double x,y;
+  int z;
+  x=fabs(max-min);
+  z=(int)log10(x);
+  y=x/pow((double)10,(double)z);
+  dg=1*pow((double)10,(double)z);
+  if(y<5){dg=0.5*pow((double)10,(double)z);}
+  if(y<2){dg=0.2*pow((double)10,(double)z);}
 
-	double min0;
-	min0=min-fmod(min,dg);j=0;
+  double min0;
+  min0=min-fmod(min,dg);j=0;
 
-	dvec tick;
-	tick.clear();
-	if(max>min){ i=-2; while(max>=min0+dg*i){ if(min<=min0+dg*i){ tick.push_back(min0+dg*i); j++; } i+=1;} }
-	if(max<min){ i=-2; while(max<=min0-dg*i){ if(min>=min0-dg*i){ tick.push_back(min0-dg*i); j++; } i+=1;} }
-	return tick;
+  dvec tick;
+  tick.clear();
+  if(max>min){
+    for (i = -2; max >= min0 + dg * i; i++)
+      if(min<=min0+dg*i){ tick.push_back(min0+dg*i); j++; }
+  }
+  if(max<min){
+    for (i = -2; max<=min0-dg*i; i++)
+      if(min>=min0-dg*i){ tick.push_back(min0-dg*i); j++; }
+  }
+  return tick;
 }
 
 
@@ -81,9 +87,9 @@ void Line::reset(){
     YMData.clear();
 }
 void Line::color(float r,float g,float b){
-    //Color[0]=r;
-    //Color[1]=g;
-    //Color[2]=b;
+    //Color[0] = r;
+    //Color[1] = g;
+    //Color[2] = b;
 }
 /// Surface
 
@@ -105,22 +111,22 @@ void Layer::add_child(int i){Children.push_back(i);}
 
 //// MatPlot //
 MatPlot::MatPlot(){
-    is_debug1=0;
-    is_debug2=0;
+  is_debug1=0;
+  is_debug2=0;
 
-    if(is_debug1){cout<<"init()..."<<endl;}
+  if(is_debug1){cout<<"init()..."<<endl;}
 
-    mode=0;
-    init_level=0;
+  mode=0;
+  init_level=0;
 
-    iAxesSelected=-1;
+  iAxesSelected=-1;
 
-    colormap("Jet");
+  colormap("Jet");
 
-    xPassive=100;
-    yPassive=0;
+  xPassive=100;
+  yPassive=0;
     
-    if(is_debug1){cout<<"init()...done"<<endl;}
+  if(is_debug1){cout<<"init()...done"<<endl;}
 }
 MatPlot::~MatPlot(){
     vFigure.clear();
@@ -134,84 +140,79 @@ MatPlot::~MatPlot(){
 
 void MatPlot::display(){
 
-    int is_done=0;
-    int mode_next=-1;
-    while(!is_done){
-	if(mode==0){// Allocation of objects
-
-	    if(is_debug1){cout<<"============================= allocation ..."<<endl;}
-
-	    iFigure =0;
-	    iLayer  =0; 	
-	    iAxes   =0;
-	    iLine   =0;
-	    iSurface=0;
-	    iPatch  =0;
-	    iText   =0;	    
+  int is_done=0;
+  int mode_next=-1;
+  while(!is_done){
+    if(mode==0){// Allocation of objects
+      if(is_debug1){cout<<"============================= allocation ..."<<endl;}
+      iFigure =0;
+      iLayer  =0; 	
+      iAxes   =0;
+      iLine   =0;
+      iSurface=0;
+      iPatch  =0;
+      iText   =0;	    
     
-	    if(init_level==0){vFigure.clear();}
-	    if(init_level<=1){vLayer.clear();}
-	    if(init_level<=2){vAxes.clear();}
-	    if(init_level<=3){vLine.clear();}
-	    if(init_level<=3){vSurface.clear();}
-	    if(init_level<=3){vText.clear();}
-	    if(init_level<=3){vPatch.clear();}
+      if(init_level==0){vFigure.clear();}
+      if(init_level<=1){vLayer.clear();}
+      if(init_level<=2){vAxes.clear();}
+      if(init_level<=3){vLine.clear();}
+      if(init_level<=3){vSurface.clear();}
+      if(init_level<=3){vText.clear();}
+      if(init_level<=3){vPatch.clear();}
 	    
-	    //default objects
-	    figure();
-	    layer();
-	    axes();
+      //default objects
+      figure();
+      layer();
+      axes();
 
-	    DISPLAY();
+      DISPLAY();
 
-	    if(is_debug1){cout<<"done"<<endl;}
+      if(is_debug1){cout<<"done"<<endl;}
     
-	    mode_next=1;
-	}
-	if(mode==1){// Configuration of objects
-	    if(is_debug1){cout<<"============================= configulation ..."<<endl;}
-	    iFigure =0;
-	    iLayer  =0; 	
-	    iAxes   =0;
-	    iLine   =0;
-	    iSurface=0;
-	    iPatch  =0;
-	    iText   =0;
+      mode_next=1;
+    }
+    if(mode==1){// Configuration of objects
+      if(is_debug1){cout<<"============================= configulation ..."<<endl;}
+      iFigure =0;
+      iLayer  =0; 	
+      iAxes   =0;
+      iLine   =0;
+      iSurface=0;
+      iPatch  =0;
+      iText   =0;
 
-	    //default objects
-	    figure();
-	    layer();
-	    axes();
+      //default objects
+      figure();
+      layer();
+      axes();
 
-	    DISPLAY();
+      DISPLAY();
 	
-	    mode_next=2;
+      mode_next=2;
 
-	    // checking number of objects. if it is inconsistent, then objects are reallocated.
-	    if(vFigure.size() !=iFigure ){ mode_next=0; if(is_debug1){cout<<"not match in Figure"<<endl;} }
-	    if(vAxes.size()   !=iAxes   ){ mode_next=0; if(is_debug1){cout<<"not match in Axes"<<endl;}}
-	    if(vLine.size()   !=iLine   ){ mode_next=0; if(is_debug1){cout<<"not match in Line"<<endl;}}
-	    if(vSurface.size()!=iSurface){ mode_next=0; if(is_debug1){cout<<"not match in Surface"<<endl;}}
-	    if(vText.size()   !=iText   ){ mode_next=0; if(is_debug1){cout<<"not match in Text"<<endl;}}
-	    if(vLayer.size()  !=iLayer  ){ mode_next=0; if(is_debug1){cout<<"not match in Layer"<<endl;}}
+      // checking number of objects. if it is inconsistent, then objects are reallocated.
+      if(vFigure.size() !=iFigure ) mode_next=0; if(is_debug1){cout<<"not match in Figure"<<endl;}
+    }
+    if(vAxes.size()   !=iAxes   ){ mode_next=0; if(is_debug1){cout<<"not match in Axes"<<endl;}}
+    if(vLine.size()   !=iLine   ){ mode_next=0; if(is_debug1){cout<<"not match in Line"<<endl;}}
+    if(vSurface.size()!=iSurface){ mode_next=0; if(is_debug1){cout<<"not match in Surface"<<endl;}}
+    if(vText.size()   !=iText   ){ mode_next=0; if(is_debug1){cout<<"not match in Text"<<endl;}}
+    if(vLayer.size()  !=iLayer  ){ mode_next=0; if(is_debug1){cout<<"not match in Layer"<<endl;}}
 
-	    for(int i=0;i<vAxes.size();++i){ vAxes[i].config(); }
+    for(int i=0;i<vAxes.size();++i){ vAxes[i].config(); }
 
-	    if(is_debug1){cout<<"done"<<endl;}
-	}
-	if(mode==2){// display
+    if(is_debug1){cout<<"done"<<endl;}
+  }
 
-	    if(is_debug1){cout<<"============================= display ..."<<endl;}	
-
-	    display_figure();
-
-	    if(is_debug1){cout<<" done "<<endl;}
-
-	    mode_next=1;
-	    is_done=1;
-	}
-	mode=mode_next;
-    }	
+  if(mode==2){// display
+    if(is_debug1){cout<<"============================= display ..."<<endl;}	
+    display_figure();
+    if(is_debug1){cout<<" done "<<endl;}
+      mode_next=1;
+      is_done=1;
+  }
+    mode=mode_next;	
 }
 
 void MatPlot::color(float r,float g,float b){
@@ -1253,129 +1254,129 @@ void MatPlot::Axes_motion(int x, int y ){
 
 /// subplot
 int MatPlot::subplot(int m,int n,int p){	
-    int h=axes();
-    int ix,iy;
-    ix=(p-1)%n;
-    iy=(m-1)-(p-1)/n;
-    ca->Position[0]=(ix+0.13)/n;
-    ca->Position[1]=(iy+0.11)/m;
-    ca->Position[2]=0.775/n;
-    ca->Position[3]=0.815/m;
+  int h=axes();
+  int ix,iy;
+  ix=(p-1)%n;
+  iy=(m-1)-(p-1)/n;
+  ca->Position[0]=(ix+0.13)/n;
+  ca->Position[1]=(iy+0.11)/m;
+  ca->Position[2]=0.775/n;
+  ca->Position[3]=0.815/m;
 
-    ca->Viewport3d[0]=1.0*ix/n;
-    ca->Viewport3d[1]=1.0*iy/m;
-    ca->Viewport3d[2]=1.0/n;
-    ca->Viewport3d[3]=1.0/m;
+  ca->Viewport3d[0]=1.0*ix/n;
+  ca->Viewport3d[1]=1.0*iy/m;
+  ca->Viewport3d[2]=1.0/n;
+  ca->Viewport3d[3]=1.0/m;
 
-    return h;
+  return h;
 }
 /// colorbar
 int MatPlot::colorbar(){
-    float l,b,w,h;
-    l=ca->Position[0];
-    b=ca->Position[1];
-    w=ca->Position[2];
-    h=ca->Position[3];
-    float zmin,zmax;
-    zmin=ca->ZLim[0];
-    zmax=ca->ZLim[1];
+  float l,b,w,h;
+  l=ca->Position[0];
+  b=ca->Position[1];
+  w=ca->Position[2];
+  h=ca->Position[3];
+  float zmin,zmax;
+  zmin=ca->ZLim[0];
+  zmax=ca->ZLim[1];
     
-    // TODO use in 3D
+  // TODO use in 3D
     
-    int hh=axes();
-    ca->ColorMap=cmap;
-    ca->View=2;
-    ca->Position[0]=l+w+w*0.01;
-    ca->Position[1]=b;
-    ca->Position[2]=w*0.05;
-    ca->Position[3]=h;
-    ca->ZLim[0]=zmin;
-    ca->ZLim[1]=zmax;
-    ca->YLim[0]=zmin;
-    ca->YLim[1]=zmax;
-    return hh;
+  int hh=axes();
+  ca->ColorMap=cmap;
+  ca->View=2;
+  ca->Position[0]=l+w+w*0.01;
+  ca->Position[1]=b;
+  ca->Position[2]=w*0.05;
+  ca->Position[3]=h;
+  ca->ZLim[0]=zmin;
+  ca->ZLim[1]=zmax;
+  ca->YLim[0]=zmin;
+  ca->YLim[1]=zmax;
+  return hh;
 }
 /// axis
 void MatPlot::axis(double xMin,double xMax,double yMin,double yMax){	
-    if(xMin!=xMax){
-	ca->XLim[0]=xMin;
-	ca->XLim[1]=xMax;
-	ca->XLimMode=1;
-    }
-    if(yMin!=yMax){
-	ca->YLim[0]=yMin;
-	ca->YLim[1]=yMax;		
-	ca->YLimMode=1;
-    }
-    ca->View=0;//2D
+  if(xMin!=xMax){
+    ca->XLim[0]=xMin;
+    ca->XLim[1]=xMax;
+    ca->XLimMode=1;
+  }
+  if(yMin!=yMax){
+    ca->YLim[0]=yMin;
+    ca->YLim[1]=yMax;		
+    ca->YLimMode=1;
+  }
+  ca->View=0;//2D
 }
 
 void MatPlot::axis(double xMin,double xMax,double yMin,double yMax,double zMin,double zMax){
-    ca->XLim[0]=xMin; ca->XLim[1]=xMax;
-    ca->YLim[0]=yMin; ca->YLim[1]=yMax;
-    ca->ZLim[0]=zMin; ca->ZLim[1]=zMax;
-    ca->XLimMode=1;
-    ca->YLimMode=1;
-    ca->ZLimMode=1;
-    ca->View=1;//3D
+  ca->XLim[0]=xMin; ca->XLim[1]=xMax;
+  ca->YLim[0]=yMin; ca->YLim[1]=yMax;
+  ca->ZLim[0]=zMin; ca->ZLim[1]=zMax;
+  ca->XLimMode=1;
+  ca->YLimMode=1;
+  ca->ZLimMode=1;
+  ca->View=1;//3D
 }
 void MatPlot::axis(string s){
-    if( s=="on"  ){ca->Box=1;}
-    if( s=="off" ){ca->Box=0;}    
+  if( s=="on"  ){ca->Box=1;}
+  if( s=="off" ){ca->Box=0;}    
 }
 void MatPlot::axis(int s){
-    if(s){ca->Box=1;}
-    else{ ca->Box=0;}    
+  if(s){ca->Box=1;}
+  else{ ca->Box=0;}    
 }
 void MatPlot::grid(string s){
-    if( s=="on" ){ca->XGrid=1; ca->YGrid=1; ca->ZGrid=1;}
-    if( s=="off"){ca->XGrid=0; ca->YGrid=0; ca->ZGrid=0;}    
+  if( s=="on" ){ca->XGrid=1; ca->YGrid=1; ca->ZGrid=1;}
+  if( s=="off"){ca->XGrid=0; ca->YGrid=0; ca->ZGrid=0;}    
 }
 void MatPlot::grid(int s){
-    if(s){ca->XGrid=1; ca->YGrid=1; ca->ZGrid=1;}
-    else{ca->XGrid=0; ca->YGrid=0; ca->ZGrid=0;}    
+  if(s){ca->XGrid=1; ca->YGrid=1; ca->ZGrid=1;}
+  else{ca->XGrid=0; ca->YGrid=0; ca->ZGrid=0;}    
 }
 void MatPlot::ticklabel(int s){
-    if(s){ca->TickLabel=1;}
-    else{ ca->TickLabel=0;}    
+  if(s){ca->TickLabel=1;}
+  else{ ca->TickLabel=0;}    
 }
 void MatPlot::title(string s){
-    ca->Title=s;
+  ca->Title=s;
 }
 void MatPlot::xlabel(string s){
-    ca->XLabel=s;
+  ca->XLabel=s;
 }
 void MatPlot::ylabel(string s){
-    ca->YLabel=s;
+  ca->YLabel=s;
 }
 void MatPlot::mouse_capture(double *xmouse,double *ymouse){
-    ca->Mouse=1;
-    //ca->XMouse = xmouse;
-    //ca->YMouse = ymouse;
+  ca->Mouse=1;
+  //ca->XMouse = xmouse;
+  //ca->YMouse = ymouse;
 }
 /// Fmax Fmin
 double Fmax(dvec x){
-    double max=-1e99;
-    for(int i=0;i<x.size();++i){
-	if(x[i]>max){max=x[i];}
-    }
-    return max;
+  double max=-1e99;
+  for(int i=0;i<x.size();++i){
+    if(x[i]>max){max=x[i];}
+  }
+  return max;
 }
 double Fmin(dvec x){
-    double min=1e99;
-    for(int i=0;i<x.size();++i){
-	if(x[i]<min){min=x[i];}
-    }
-    return min;
+  double min=1e99;
+  for(int i=0;i<x.size();++i){
+    if(x[i]<min){min=x[i];}
+  }
+  return min;
 }
 double Fmax(dmat x){
-    double max=-1e99;
-    for(int i=0;i<x.size();++i){
-	for(int j=0;j<x[i].size();++j){
-	    if(x[i][j] > max){max=x[i][j];}
-	}
+  double max=-1e99;
+  for(int i=0;i<x.size();++i){
+    for(int j=0;j<x[i].size();++j){
+      if(x[i][j] > max){max=x[i][j];}
     }
-    return max;
+  }
+  return max;
 }
 double Fmin(dmat x){
     double min=1e99;
@@ -1405,37 +1406,37 @@ int MatPlot::line(){
     return h;
 }
 void MatPlot::line_config(){
-    int n;
-    double t; 
-    n=cl->XData.size();
-    if(ca->XScale==0){//linear
-	for(int i=0;i<n;++i){
-	    t=cl->XData[i];	    
-	    if(ca->xmin>t){ca->xmin=t;}
-	    if(ca->xmax<t){ca->xmax=t;}
-	}
-    }
-    if(ca->XScale==1){//log
-	for(int i=0;i<n;++i){
-	    t=cl->XData[i];	    
-	    if((ca->xmin>t)&&(t>0)){ca->xmin=t;}
-	    if(ca->xmax<t){ca->xmax=t;}
-	}
-    }
-    double y;
-    n=cl->YData.size();
+  int n;
+  double t; 
+  n=cl->XData.size();
+  if(ca->XScale==0){//linear
     for(int i=0;i<n;++i){
-	y=cl->YData[i];	    
-	if(ca->ymin>y){ca->ymin=y;}
-	if(ca->ymax<y){ca->ymax=y;}
+      t=cl->XData[i];	    
+      if(ca->xmin>t){ca->xmin=t;}
+      if(ca->xmax<t){ca->xmax=t;}
     }
-    double z;
-    n=cl->ZData.size();
+  }
+  if(ca->XScale==1){//log
     for(int i=0;i<n;++i){
-	z=cl->ZData[i];  
-	if(ca->zmin>z){ca->zmin=z;}
-	if(ca->zmax<z){ca->zmax=z;}
+      t=cl->XData[i];	    
+      if((ca->xmin>t)&&(t>0)){ca->xmin=t;}
+      if(ca->xmax<t){ca->xmax=t;}
     }
+  }
+  double y;
+  n=cl->YData.size();
+  for(int i=0;i<n;++i){
+    y=cl->YData[i];	    
+    if(ca->ymin>y){ca->ymin=y;}
+    if(ca->ymax<y){ca->ymax=y;}
+  }
+  double z;
+  n=cl->ZData.size();
+  for(int i=0;i<n;++i){
+    z=cl->ZData[i];  
+    if(ca->zmin>z){ca->zmin=z;}
+    if(ca->zmax<z){ca->zmax=z;}
+  }
 }
 int MatPlot::line(dvec x,dvec y){
     int h=line();
@@ -1447,14 +1448,14 @@ int MatPlot::line(dvec x,dvec y){
     return h;
 }
 int MatPlot::line(dvec x,dvec y,dvec z){
-    int h=line();
-    if(cfr->Visible){
-	cl->XData=x;
-	cl->YData=y; 
-	cl->ZData=z;
-	line_config();
-    }
-    return h;
+  int h=line();
+  if(cfr->Visible){
+    cl->XData=x;
+    cl->YData=y; 
+    cl->ZData=z;
+    line_config();
+  }
+  return h;
 }
 /// vertex
 int MatPlot::begin(){ return line(); }
@@ -1469,42 +1470,43 @@ void  MatPlot::vertex(double x,double y){
 	cl->YData.push_back(y);
     }
 }
+
 /// plot, semilogx, semilogy, loglog
 int MatPlot::plot(dvec y){
-    int n=y.size();
-    dvec x;
-    x.resize(n);    
-    for(int i=0;i<n;++i){x[i]=1.0*i/(n-1);}
-    return line(x,y);
+  int n=y.size();
+  dvec x;
+  x.resize(n);    
+  for(int i=0;i<n;++i){x[i]=1.0*i/(n-1);}
+  return line(x,y);
 }
 int MatPlot::plot(dvec x,dvec y){	
-    return line(x,y);
+  return line(x,y);
 }
 int MatPlot::plot(valarray<double> x,valarray<double> y){	
-    dvec xx,yy;
-    for(int i=0;i<x.size();++i){xx.push_back(x[i]);}
-    for(int i=0;i<y.size();++i){yy.push_back(y[i]);}    
-    return line(xx,yy);
+  dvec xx,yy;
+  for(int i=0;i<x.size();++i){xx.push_back(x[i]);}
+  for(int i=0;i<y.size();++i){yy.push_back(y[i]);}    
+  return line(xx,yy);
 }
 int MatPlot::semilogx(dvec x,dvec y){
-    ca->XScale=1;
-    int h=line();
-    if(cfr->Visible){
-	cl->XData=x;
-	cl->YData=y; 
-	line_config();
-    }
-    return h;
+  ca->XScale=1;
+  int h=line();
+  if(cfr->Visible){
+    cl->XData=x;
+    cl->YData=y; 
+    line_config();
+  }
+  return h;
 }
 int MatPlot::semilogy(dvec x,dvec y){
-    ca->YScale=1;    
-    int h=line();
-    if(cfr->Visible){
-	cl->XData=x;
-	cl->YData=y; 
-	line_config();
-    }
-    return h;
+  ca->YScale=1;    
+  int h=line();
+  if(cfr->Visible){
+    cl->XData=x;
+    cl->YData=y; 
+    line_config();
+  }
+  return h;
 }
 int MatPlot::loglog(dvec x,dvec y){
     ca->XScale=1;
@@ -1544,27 +1546,27 @@ int MatPlot::errorbar(dvec x,dvec y,dvec ep,dvec em){
     }
 /// 3D line
 void MatPlot::vertex(double x,double y,double z){
-    if(cfr->Visible){
-	if(ca->xmin>x){ca->xmin=x;}
-	if(ca->xmax<x){ca->xmax=x;}
-	if(ca->ymin>y){ca->ymin=y;}
-	if(ca->ymax<y){ca->ymax=y;}
-	if(ca->zmin>z){ca->zmin=z;}
-	if(ca->zmax<z){ca->zmax=z;}
-	cl->XData.push_back(x);
-	cl->YData.push_back(y);
-	cl->ZData.push_back(z);
-    }
-    //if(cl->LineStyle){//Line
-    //glVertex3d(ct3x(x),ct3y(y),ct3z(z));
-    //}
+  if(cfr->Visible){
+    if(ca->xmin>x){ca->xmin=x;}
+    if(ca->xmax<x){ca->xmax=x;}
+    if(ca->ymin>y){ca->ymin=y;}
+    if(ca->ymax<y){ca->ymax=y;}
+    if(ca->zmin>z){ca->zmin=z;}
+    if(ca->zmax<z){ca->zmax=z;}
+    cl->XData.push_back(x);
+    cl->YData.push_back(y);
+    cl->ZData.push_back(z);
+  }
+  //if(cl->LineStyle){//Line
+  //glVertex3d(ct3x(x),ct3y(y),ct3z(z));
+  //}
 }    
 int MatPlot::plot3(dvec x,dvec y,dvec z){
-    ca->View=1;
-    begin();
-    for(int i=0;i<x.size();++i){ vertex(x[i],y[i],z[i]); }
-    end();
-    return 0;
+  ca->View=1;
+  begin();
+  for(int i=0;i<x.size();++i){ vertex(x[i],y[i],z[i]); }
+  end();
+  return 0;
 }
 
 /// display_line
@@ -1768,20 +1770,19 @@ void MatPlot::display_line(){
 
 // Surface ///
 int MatPlot::surface(){
-    int h=iSurface*100 + tSurface; hObj=h;
-    if(is_debug1){printf("mode: %d handle: %4d Surface\n",mode,h);}
-
-    if(mode==0){
-	ca->add_child(h);	   
-	vSurface.push_back(Surface(h));
-	//as.Parent=gca();
-    }
-    if(mode==1){
+  int h=iSurface*100 + tSurface; hObj=h;
+  if(is_debug1){printf("mode: %d handle: %4d Surface\n",mode,h);}
+  if(mode==0){
+    ca->add_child(h);	   
+    vSurface.push_back(Surface(h));
+    //as.Parent=gca();
+  }
+  if(mode==1){
 	
-    }
-    if(iSurface<vSurface.size()){cs=&vSurface[iSurface];}
-    iSurface++;
-    return h;    
+  }
+  if(iSurface<vSurface.size()){cs=&vSurface[iSurface];}
+  iSurface++;
+  return h;    
 }
 
 void MatPlot::surface_config(){

@@ -18,6 +18,8 @@ Version:0.3.13
 
 #define PI 3.14159265358979323846264
 
+using namespace std;
+
 typedef vector<double> dvec;
 typedef vector< vector<double> > dmat;
 typedef vector< vector<float> > tcvec;
@@ -25,9 +27,9 @@ typedef vector< vector< vector<float> > > tcmat;
 
 inline vector<double> linspace(double min,double max,int n){
     vector<double> a;
-    if(n<1){n=1;}
+    if(n<1) n=1;
     a.resize(n);
-    for(int i=0;i<n;++i){a[i]=min+(max-min)*i/(n-1);}
+    for(int i=0;i<n;++i) a[i] = min + (max-min)*i / (n-1);
     return a;
 };
 

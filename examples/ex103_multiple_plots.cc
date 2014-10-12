@@ -1,6 +1,8 @@
 //Copyright (c) 2011 Yuichi Katori (yuichi.katori@gmail.com) All Rights Reserved
 using namespace std;
 #include "matplotpp.h"
+#include <unistd.h>
+
 class MP :public MatPlot{ 
 void DISPLAY(){
     int n=100;
